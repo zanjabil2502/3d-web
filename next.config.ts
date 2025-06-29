@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable static export output for GitHub Pages deployment
-  output: 'export',
+  output: "export",
+  reactStrictMode: true,
 
   // Enable experimental features jika diperlukan
   experimental: {
