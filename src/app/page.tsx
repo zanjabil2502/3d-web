@@ -74,186 +74,12 @@ export default function Home() {
     fillLight.position.set(0, -2, 2);
     scene.add(fillLight);
 
-    // Create interactive particles system
-    const createInteractiveParticles = () => {
-      const particlesGroup = new THREE.Group();
-      
-      for (let i = 0; i < 20; i++) {
-        const particleGeometry = new THREE.SphereGeometry(0.03, 8, 8);
-        const particleMaterial = new THREE.MeshBasicMaterial({ 
-          color: 0x81C784,
-          transparent: true,
-          opacity: 0.6
-        });
-        const particle = new THREE.Mesh(particleGeometry, particleMaterial);
-        
-        // Random initial positions around robot
-        const angle = (i / 20) * Math.PI * 2;
-        const radius = 2 + Math.random() * 1;
-        particle.position.set(
-          Math.cos(angle) * radius + 3,
-          Math.sin(angle * 3) * 0.5 + Math.random() * 2,
-          Math.sin(angle) * radius
-        );
-        
-        // Store original position for animation
-        particle.userData = {
-          originalX: particle.position.x,
-          originalY: particle.position.y,
-          originalZ: particle.position.z,
-          speed: 0.5 + Math.random() * 0.5
-        };
-        
-        particlesGroup.add(particle);
-      }
-      
-      return particlesGroup;
-    };
-
-    // Create invisible interaction sphere for mouse detection
-    const createInteractionSphere = () => {
-      const sphereGeometry = new THREE.SphereGeometry(2, 16, 16);
-      const sphereMaterial = new THREE.MeshBasicMaterial({ 
-        transparent: true,
-        opacity: 0,
-        visible: false
-      });
-      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-      sphere.position.set(3, 0, 0);
-      return sphere;
-    };
-
-    // Create welcome robot fallback model with enhanced interactivity
-    const createWelcomeRobot = () => {
-      const group = new THREE.Group();
-      
-      // Robot body - green color with white lighting
-      const bodyGeometry = new THREE.CapsuleGeometry(0.8, 1.5, 4, 8);
-      const bodyMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0x2d7a3d, // Darker green for body
-        shininess: 100,
-        transparent: true,
-        opacity: 0.95
-      });
-      const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-      body.castShadow = true;
-      group.add(body);
-
-      // Robot head - brighter green with interactive glow
-      const headGeometry = new THREE.SphereGeometry(0.6, 16, 16);
-      const headMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0x4CAF50, // Material Design Green
-        transparent: true,
-        opacity: 0.9,
-        shininess: 120
-      });
-      const head = new THREE.Mesh(headGeometry, headMaterial);
-      head.position.y = 1.5;
-      head.castShadow = true;
-      head.userData = { isHead: true }; // Mark as head for special animation
-      group.add(head);
-
-      // Robot eyes - bright green glow with blink animation
-      for (let i = 0; i < 2; i++) {
-        const eyeGeometry = new THREE.SphereGeometry(0.15, 8, 8);
-        const eyeMaterial = new THREE.MeshBasicMaterial({ 
-          color: 0x76FF03, // Bright lime green for eyes
-          transparent: true,
-          opacity: 1
-        });
-        const eye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        eye.position.set(i === 0 ? -0.2 : 0.2, 1.6, 0.4);
-        eye.userData = { isEye: true, originalScale: 1 };
-        group.add(eye);
-
-        // Eye glow effect with pulsing
-        const glowGeometry = new THREE.SphereGeometry(0.25, 8, 8);
-        const glowMaterial = new THREE.MeshBasicMaterial({ 
-          color: 0x76FF03,
-          transparent: true,
-          opacity: 0.3
-        });
-        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-        glow.position.copy(eye.position);
-        glow.userData = { isGlow: true };
-        group.add(glow);
-      }
-
-      // Robot arms - medium green with gesture animation
-      for (let i = 0; i < 2; i++) {
-        const armGeometry = new THREE.CapsuleGeometry(0.2, 1.2, 4, 8);
-        const armMaterial = new THREE.MeshPhongMaterial({ 
-          color: 0x388E3C, // Medium green for arms
-          shininess: 80
-        });
-        const arm = new THREE.Mesh(armGeometry, armMaterial);
-        
-        // Position arms in welcoming pose
-        arm.position.set(i === 0 ? -1.2 : 1.2, 0.5, 0);
-        arm.rotation.z = i === 0 ? Math.PI / 6 : -Math.PI / 6;
-        arm.rotation.x = -Math.PI / 8;
-        arm.castShadow = true;
-        arm.userData = { 
-          isArm: true, 
-          side: i === 0 ? 'left' : 'right',
-          originalRotationZ: arm.rotation.z,
-          originalRotationX: arm.rotation.x
-        };
-        group.add(arm);
-
-        // Robot hands - bright green with wave animation
-        const handGeometry = new THREE.SphereGeometry(0.3, 8, 8);
-        const handMaterial = new THREE.MeshPhongMaterial({ 
-          color: 0x66BB6A, // Light green for hands
-          transparent: true,
-          opacity: 0.9,
-          shininess: 100
-        });
-        const hand = new THREE.Mesh(handGeometry, handMaterial);
-        hand.position.set(
-          i === 0 ? -1.8 : 1.8, 
-          0.2, 
-          0.3
-        );
-        hand.castShadow = true;
-        hand.userData = { 
-          isHand: true, 
-          side: i === 0 ? 'left' : 'right',
-          originalY: hand.position.y
-        };
-        group.add(hand);
-      }
-
-      // Chest panel with interactive pulse
-      const panelGeometry = new THREE.BoxGeometry(0.6, 0.4, 0.1);
-      const panelMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0x1B5E20, // Dark green for panel
-        emissive: new THREE.Color(0x2E7D32), // Green emissive
-        emissiveIntensity: 0.2,
-        shininess: 150
-      });
-      const panel = new THREE.Mesh(panelGeometry, panelMaterial);
-      panel.position.set(0, 0.3, 0.8);
-      panel.userData = { isPanel: true };
-      group.add(panel);
-
-      return group;
-    };
-
-    // Initialize interactive elements
-    const particles = createInteractiveParticles();
-    particlesRef.current = particles;
-    scene.add(particles);
-
-    const interactionSphere = createInteractionSphere();
-    interactionSphereRef.current = interactionSphere;
-    scene.add(interactionSphere);
 
     // Raycaster for mouse interaction
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
-    // Load GLTF Model with enhanced interactivity
+    // Load GLTF Model
     const loader = new GLTFLoader();
     loader.load(
       '/model/textured_mesh.glb',
@@ -265,7 +91,7 @@ export default function Home() {
           if (child instanceof THREE.Mesh) {
             child.castShadow = true;
             child.receiveShadow = true;
-            
+
             if (child.material) {
               if (Array.isArray(child.material)) {
                 child.material.forEach(mat => {
@@ -284,7 +110,7 @@ export default function Home() {
           }
         });
 
-        // Position model on the right side as welcome robot
+        // Position model on the right side
         model.scale.setScalar(2);
         model.position.set(3, 0, 0); // Right side position
         scene.add(model);
@@ -296,11 +122,6 @@ export default function Home() {
       },
       (error) => {
         console.error('Error loading model:', error);
-        const welcomeRobot = createWelcomeRobot();
-        welcomeRobot.scale.setScalar(1.5);
-        welcomeRobot.position.set(3, 0, 0); // Right side position
-        modelRef.current = welcomeRobot;
-        scene.add(welcomeRobot);
         setIsLoading(false);
       }
     );
@@ -319,41 +140,9 @@ export default function Home() {
       targetRotationRef.current.y = mouseRef.current.x * Math.PI * 0.3; // Increased sensitivity
       targetRotationRef.current.x = mouseRef.current.y * Math.PI * 0.15; // Increased sensitivity
 
-      // Check for intersection with interaction sphere
-      if (interactionSphereRef.current) {
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObject(interactionSphereRef.current);
-        
-        if (intersects.length > 0) {
-          setIsMouseOver(true);
-        } else {
-          setIsMouseOver(false);
-        }
-      }
-    };
-
-    // Mouse click interaction
-    const handleMouseClick = (event: MouseEvent) => {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-      
-      if (interactionSphereRef.current) {
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObject(interactionSphereRef.current);
-        
-        if (intersects.length > 0) {
-          // Trigger special animation on click
-          if (modelRef.current) {
-            // Create a wave effect
-            modelRef.current.userData.clicked = true;
-            modelRef.current.userData.clickTime = Date.now();
-          }
-        }
-      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('click', handleMouseClick);
 
     // Enhanced animation loop with interactive effects
     const animate = () => {
@@ -370,91 +159,12 @@ export default function Home() {
         modelRef.current.rotation.x = currentRotationRef.current.x;
         modelRef.current.rotation.y = currentRotationRef.current.y + Math.sin(time * 0.5) * 0.1;
         
-        // Enhanced floating motion based on mouse interaction
-        const floatIntensity = isMouseOver ? 0.25 : 0.15;
-        modelRef.current.position.y = Math.sin(time * 1.2) * floatIntensity;
-        
-        // Interactive scale breathing effect
-        const breatheIntensity = isMouseOver ? 0.04 : 0.02;
-        const breathe = 1 + Math.sin(time * 2) * breatheIntensity;
+        // Floating motion
+        modelRef.current.position.y = Math.sin(time * 1.2) * 0.15;
+
+        // Scale breathing effect
+        const breathe = 1 + Math.sin(time * 2) * 0.02;
         modelRef.current.scale.setScalar(2 * breathe);
-
-        // Special click animation
-        if (modelRef.current.userData.clicked) {
-          const clickElapsed = (Date.now() - modelRef.current.userData.clickTime) / 1000;
-          if (clickElapsed < 1) {
-            const wave = Math.sin(clickElapsed * Math.PI * 4) * (1 - clickElapsed);
-            modelRef.current.position.z = wave * 0.3;
-          } else {
-            modelRef.current.userData.clicked = false;
-            modelRef.current.position.z = 0;
-          }
-        }
-
-        // Animate individual robot parts for fallback model
-        modelRef.current.traverse((child) => {
-          if (child.userData.isHead) {
-            // Head follows mouse more closely
-            child.rotation.y = mouseRef.current.x * 0.3;
-            child.rotation.x = mouseRef.current.y * 0.2;
-          }
-          
-          if (child.userData.isEye) {
-            // Eye blinking animation
-            const blinkTime = Math.sin(time * 3) > 0.95 ? 0.1 : 1;
-            child.scale.y = blinkTime;
-          }
-          
-          if (child.userData.isGlow) {
-            // Pulsing glow effect
-            const pulse = 0.3 + Math.sin(time * 4) * 0.2;
-            child.material.opacity = pulse;
-          }
-          
-          if (child.userData.isArm) {
-            // Arm gestures based on mouse position
-            const armMovement = isMouseOver ? Math.sin(time * 2) * 0.2 : 0;
-            if (child.userData.side === 'left') {
-              child.rotation.z = child.userData.originalRotationZ + armMovement;
-            } else {
-              child.rotation.z = child.userData.originalRotationZ - armMovement;
-            }
-          }
-          
-          if (child.userData.isHand) {
-            // Hand waving animation
-            const wave = isMouseOver ? Math.sin(time * 3) * 0.3 : 0;
-            child.position.y = child.userData.originalY + wave;
-          }
-          
-          if (child.userData.isPanel) {
-            // Panel pulse based on interaction
-            const pulseIntensity = isMouseOver ? 0.4 : 0.2;
-            child.material.emissiveIntensity = pulseIntensity + Math.sin(time * 2) * 0.1;
-          }
-        });
-      }
-
-      // Animate interactive particles
-      if (particlesRef.current) {
-        particlesRef.current.children.forEach((particle, index) => {
-          const userData = particle.userData;
-          
-          // Particles react to mouse position
-          const mouseInfluence = isMouseOver ? 1.5 : 1;
-          const speed = userData.speed * mouseInfluence;
-          
-          // Orbital motion with mouse influence
-          const angle = time * speed + index * 0.5;
-          const radius = 2 + Math.sin(time + index) * 0.5;
-          
-          particle.position.x = userData.originalX + Math.cos(angle) * radius * 0.3;
-          particle.position.y = userData.originalY + Math.sin(angle * 2) * 0.3;
-          particle.position.z = userData.originalZ + Math.sin(angle) * radius * 0.3;
-          
-          // Particle opacity based on interaction
-          particle.material.opacity = isMouseOver ? 0.9 : 0.6;
-        });
       }
 
       // Camera looks at the robot on the right
@@ -479,7 +189,6 @@ export default function Home() {
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('click', handleMouseClick);
       
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current);
@@ -518,8 +227,8 @@ export default function Home() {
         <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="text-center">
             <div className="w-20 h-20 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <h3 className="text-2xl font-bold text-white mb-2">Initializing Welcome Robot</h3>
-            <p className="text-emerald-400 text-lg font-medium">Preparing Robot Assistant...</p>
+            <h3 className="text-2xl font-bold text-white mb-2">Loading 3D Model</h3>
+            <p className="text-emerald-400 text-lg font-medium">Preparing 3D Scene...</p>
             <div className="mt-4 w-64 bg-slate-700 rounded-full h-2 mx-auto">
               <div 
                 className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-2 rounded-full transition-all duration-300"
@@ -569,7 +278,7 @@ export default function Home() {
             </h2>
             
             <p className="text-gray-300 text-lg leading-relaxed max-w-md">
-              Meet your AI-powered Robot Assistant. Move your mouse to interact and click to activate special features.
+              Experience our interactive 3D model. Move your mouse to see the model respond to your movements.
             </p>
             
             {/* CTA Buttons */}
@@ -584,46 +293,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Interactive Status Indicator */}
-        <div className="absolute bottom-8 right-8 z-10">
-          <div className={`bg-emerald-500/20 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg border transition-all duration-300 ${
-            isMouseOver ? 'border-emerald-400 bg-emerald-500/30' : 'border-emerald-500/30'
-          }`}>
-            <p className="text-emerald-400 font-medium text-sm flex items-center">
-              <span className="mr-2">🤖</span>
-              {isMouseOver ? 'Robot is responding to your interaction!' : 'Move mouse over robot to interact'}
-            </p>
-          </div>
-        </div>
-
-        {/* Enhanced Welcome Message from Robot */}
-        <div className="absolute right-8 top-1/3 z-10 hidden lg:block">
-          <div className={`bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border max-w-xs transition-all duration-300 ${
-            isMouseOver ? 'border-emerald-400 bg-slate-800/95' : 'border-emerald-500/30'
-          }`}>
-            <div className="flex items-start space-x-3">
-              <div className={`w-8 h-8 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                isMouseOver ? 'animate-pulse' : ''
-              }`}>
-                <span className="text-white text-xs">🤖</span>
-              </div>
-              <div>
-                <h4 className="text-white font-semibold mb-2">Robot Assistant</h4>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {isMouseOver 
-                    ? "I can see you! Try clicking on me for a special animation!" 
-                    : "Hello! I'm here to help you with quality control processes. Ready to get started?"
-                  }
-                </p>
-                <div className="mt-3 flex space-x-2">
-                  <div className={`w-2 h-2 bg-emerald-400 rounded-full ${isMouseOver ? 'animate-bounce' : 'animate-pulse'}`}></div>
-                  <div className={`w-2 h-2 bg-emerald-400 rounded-full ${isMouseOver ? 'animate-bounce' : 'animate-pulse'}`} style={{animationDelay: '0.2s'}}></div>
-                  <div className={`w-2 h-2 bg-emerald-400 rounded-full ${isMouseOver ? 'animate-bounce' : 'animate-pulse'}`} style={{animationDelay: '0.4s'}}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
