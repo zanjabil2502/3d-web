@@ -495,7 +495,7 @@ export default function Home() {
                 <p className="text-gray-300 text-sm leading-relaxed">
                   {isMouseOver 
                     ? "I can see you! Try clicking on me for a special animation!" 
-                    : "Hello! I'm here to help you with quality control processes. Ready to get started?"
+                    : "Hello! I'm here to help you anything. Ready to get started?"
                   }
                 </p>
                 <div className="mt-3 flex space-x-2">
