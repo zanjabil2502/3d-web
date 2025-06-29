@@ -82,7 +82,7 @@ export default function Home() {
     // Load GLTF Model
     const loader = new GLTFLoader();
     loader.load(
-      './model/textured_mesh.glb',
+      'textured_mesh.glb',
       (gltf) => {
         const model = gltf.scene;
         modelRef.current = model;
